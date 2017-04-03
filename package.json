@@ -1,0 +1,22 @@
+{
+	"name": "Emmit",
+	"version": "1.0.0",
+	"description": "Get dependencies in watch",
+	"main": "index.js",
+	"keywords": [
+		"dependency",
+		"inheritance",
+		"emmit",
+		"inheritance",
+		"pug",
+		"jade"
+		"html",
+		"css",
+		"stylus"
+	],
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Jhon Castro Blas",
+	"license": "MIT",
+}
