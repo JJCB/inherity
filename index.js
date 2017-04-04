@@ -20,19 +20,19 @@ let inherity = function(mainConfig){
     configLanguage[index]       = dependencies.createDependencies(configLanguage[index])
   }
   
-  let getListDependencies = (opts)=>{
-
-    if(! opts.chunk.type=="deleted"){
-      configLanguage[opts.language].dependencies = {}
-      configLanguage[opts.language] = dependencies.createDependencies(configLanguage[opts.language])
-    }
-
-    let lisView = dependencies.listDependencies(opts.chunk.path, configLanguage[opts.language]);
-    return lisView
-
-  }
+  
   return {
-    getListDependencies : getListDependencies
+    getListDependencies : (opts)=>{
+      
+      if(! opts.chunk.type=="deleted"){
+        configLanguage[opts.language].dependencies = {}
+        configLanguage[opts.language] = dependencies.createDependencies(configLanguage[opts.language])
+      }
+
+      let lisView = dependencies.listDependencies(opts.chunk.path, configLanguage[opts.language]);
+      return lisView
+
+    }
   }
 }
 module.exports =  inherity
