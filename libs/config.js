@@ -1,4 +1,4 @@
-configLanguage = {
+module.exports = {
   pug: {
     matcher       : /(?:include|extends):?.*\s+(.*.pug)/,
     base          : process.cwd(),
@@ -28,5 +28,3 @@ configLanguage = {
     }
   }
 }
-
-module.exports = configLanguage

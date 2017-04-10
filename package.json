@@ -1,11 +1,11 @@
 {
-	"name": "Emmit",
+	"name": "inherity",
 	"version": "1.0.0",
-	"description": "Get dependencies in watch",
+	"description": "Get dependencies in anyone file",
 	"main": "index.js",
 	"keywords": [
-		"dependency",
-		"inheritance",
+		"inherity",
+		"dependency",		
 		"emmit",
 		"inheritance",
 		"pug",
@@ -18,5 +18,5 @@
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "Jhon Castro Blas",
-	"license": "MIT",
+	"license": "MIT"
 }

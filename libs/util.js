@@ -1,6 +1,6 @@
 var glob          = require("glob")
 
-let util = {
+module.exports = {
 	removeDuplicates : (array) =>{
 		return array.filter(function (item, index, self) {
 			return self.indexOf(item) == index;
@@ -9,9 +9,9 @@ let util = {
 	getPathsFromGlobs : (directory) => {
 		let arrayPaths = []
 
-		for (let z = 0, lengthDirectory= directory.length; z < lengthDirectory; z++) {
+		for (let i = 0, lengthDirectory= directory.length; i < lengthDirectory; i++) {
 
-			let pathCurrent = directory[z]
+			let pathCurrent = directory[i]
 			let paths = glob.sync(pathCurrent);
 			arrayPaths =  arrayPaths.concat(paths)
 		}
@@ -19,5 +19,3 @@ let util = {
 		return arrayPaths
 	}
 }
-
-module.exports = util
