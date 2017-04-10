@@ -1,11 +1,11 @@
-var fs              = require('fs')
-var pathNode        = require("path")
-var glob            = require("glob")
+const fs              = require('fs'),
+      pathNode        = require("path"),
+      glob            = require("glob"),
 
-var cleanComments   = require("./cleanComment") 
-var util            = require("./util")
+      cleanComments   = require("./cleanComment"),
+      util            = require("./util");
 
-let  configLanguage = {}
+let  configLanguage = {};
 
 fn = {
   createDependencies: (config) => {
@@ -17,13 +17,13 @@ fn = {
       let path    = paths[k];
       let data    = fs.readFileSync(path)
       let content = data.toString();
-      content     = cleanComments(content, configLanguage.comment)
+      content     = cleanComments({content: content, comment:configLanguage.comment})
       fn._indentBasedLanguage(path, content)
     }
     return configLanguage
   },
 
-  _indentBasedLanguage : (path, content) =>{
+  _indentBasedLanguage: (path, content) => {
 
     path = pathNode.join(configLanguage.base, path);
     const reCommentStart = new RegExp(/\/\//);
@@ -126,4 +126,3 @@ fn = {
 }
 
 module.exports  = fn
-

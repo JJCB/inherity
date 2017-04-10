@@ -1,30 +1,66 @@
-  let cleanComment = (str, comment) =>{
-    var dataReplace=[]
-    var count = 0;
 
-    var newStr = str.replace(/"(".*?")|('.*?')/g, function(valor){
+/*
+Inherity
+@class CleanComment
+@author jhon Castro
+ */
 
-      let  nameReplace = "&&&&" + count
-      dataReplace.push(valor)
-      count++
-      return nameReplace;
-    })
+/*
+ * Module dependencies.
+ */
 
-    newStr = newStr.replace(comment.multilines, '')
+let cleanComment;
 
-    if (!comment.isTab) {
+cleanComment.prototype.format = function(){
+  var self,
+      regex = /"(".*?")|('.*?')/g,
+      i = 0;
+  
+  this.replaced = [];
+  this.cad      = "&&&&";
+  self = this;
 
-      newStr = newStr.replace(comment.lines, '')
-    }
-    newStr = newStr.replace(/\n{2,}/g, '')
-
-    for (var i = 0; i < dataReplace.length; i++) {
-
-      let regex = "&&&&"+i
-      regex = new RegExp(regex,"g");
-      newStr = newStr.replace(regex,dataReplace[i] )
-    }
-    return newStr
+  self.replaceFormat = function(replacement){    
+    this.replaced.push(replacement);
+    return this.cad + i++;
   }
+  this.content = this.content.replace(regex, self.replaceFormat);
+}
 
-module.exports =  cleanComment
+cleanComment.prototype.multilines = function(){
+  this.content = this.content.replace(this.comment.multilines, '');
+}
+
+cleanComment.prototype.tabulations = function(){
+  var regex = /\n{2,}/g,
+      content = this.content;
+
+  if (!this.comment.isTab) {
+    content = content.replace(this.comment.lines, '');
+  }  
+  this.content = content.replace(regex, '');
+}
+
+cleanComment.prototype.unformat = function(){
+  var content = this.content;
+  for (var i = 0; i < this.replaced.length; i++) {
+    this.content = content.replace(new RegExp(this.cad + i, "g"), this.replaced[i])
+  }
+}
+
+cleanComment.prototype.transform = function(){
+  this.format();
+  this.multilines();
+  this.tabulations();
+  this.unformat();
+}
+
+cleanComment = function(opts) {  
+  this.comment  = opts.comment;
+  this.content  = opts.content;
+  
+  this.transform();
+  return this.content;
+}
+
+module.exports =  cleanComment;

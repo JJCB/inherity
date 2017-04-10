@@ -1,38 +1,38 @@
-// 'use strict';
+/*
+index
+@class index
+@author Jhon Castro
+ */
 
-let fs              = require('fs'),
-    pathNode        = require("path"),
-    glob            = require("glob"),
+/*
+ * Module dependencies.
+ */
 
-    cleanComments   = require("./cleanComment"),
-    util            = require("./util"),
-    configLanguage  = require("./configLanguage"),
-    dependencies    = require("./dependencies");
+const util            = require("./util"),
+      config          = require("./config"),
+      dependencies    = require("./dependencies");
+
+/*
+ * Expose library.
+ */
 
 
+module.exports = (options) => {
 
-let inherity = function(mainConfig){
-
-  for (index in mainConfig){
-
-    configLanguage[index]       = Object.assign({},configLanguage[index], mainConfig[index]);
-    configLanguage[index].paths =  util.getPathsFromGlobs(configLanguage[index].src);
-    configLanguage[index]       = dependencies.createDependencies(configLanguage[index])
+  for (key in options){
+    config[key]       = Object.assign({}, config[key], options[key]);
+    config[key].paths = util.getPathsFromGlobs(config[key].src);
+    config[key]       = dependencies.createDependencies(config[key])
   }
   
-  let getListDependencies = (opts)=>{
-
-    if(! opts.chunk.type=="deleted"){
-      configLanguage[opts.language].dependencies = {}
-      configLanguage[opts.language] = dependencies.createDependencies(configLanguage[opts.language])
-    }
-
-    let lisView = dependencies.listDependencies(opts.chunk.path, configLanguage[opts.language]);
-    return lisView
-
-  }
   return {
-    getListDependencies : getListDependencies
+    getListDependencies : (options) => {
+      if(options.chunk.type!=="deleted"){
+        config[options.language].dependencies = {}
+        config[options.language] = dependencies.createDependencies(config[options.language])
+      }
+
+      return dependencies.listDependencies(options.chunk.path, config[options.language]);
+    }
   }
 }
-module.exports =  inherity
