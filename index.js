@@ -1,6 +1,6 @@
 /*
-index
-@class index
+inherity
+@class inherity
 @author Jhon Castro
  */
 
@@ -16,23 +16,40 @@ const util            = require("./util"),
  * Expose library.
  */
 
+inherity = function(languages){
+  this.languages = languages;
+  this.init();
+  //this.setEventsChunk();  
+}
 
-module.exports = (options) => {
-
-  for (key in options){
-    config[key]       = Object.assign({}, config[key], options[key]);
-    config[key].paths = util.getPathsFromGlobs(config[key].src);
-    config[key]       = dependencies.createDependencies(config[key])
+inherity.prototype.init = function(){
+  for (lang in this.languages){
+    config[lang]        = Object.assign({}, config[lang], this.languages[lang]);
+    config[lang].paths  = util.getPathsFromGlobs(config[lang].src);
+    //config[lang].dependencies = dependencies.createDependencies(config[lang])
+    dependencies.init(config[lang]);
   }
-  
+}
+
+/*
+inherity.prototype.setEventsChunk = function(){
+  switch(this.options.chunk.type){
+    case "deleted": break;
+    case "added":
+    case "changed":
+      dependencies.setDependencies({});
+      //config[options.language].dependencies = {};
+      //config[options.language] = dependencies.createDependencies(config[options.language]);
+      break;
+  }  
+}
+*/
+module.exports = (options) => {  
   return {
     getListDependencies : (options) => {
-      if(options.chunk.type!=="deleted"){
-        config[options.language].dependencies = {}
-        config[options.language] = dependencies.createDependencies(config[options.language])
-      }
-
-      return dependencies.listDependencies(options.chunk.path, config[options.language]);
+      //this.setEventsChunk();
+      return dependencies.get(options.chunk, config[options.language]);
+      //eturn dependencies.getDependencies(options.chunk.path, config[options.language]);
     }
   }
 }
