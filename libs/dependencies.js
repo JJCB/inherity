@@ -3,9 +3,142 @@ const fs              = require('fs'),
       glob            = require("glob"),
 
       cleanComments   = require("./cleanComment"),
+      indentation     = require("./util/Identation"),
       util            = require("./util");
 
-let  configLanguage = {};
+//let  configLanguage = {};
+
+var dependencies;
+
+dependencies = function(language){
+  this.language = language;
+  this.init();
+}
+
+dependencies.prototype.init = function(){
+  this.create();
+}
+
+dependencies.prototype.create = function(){
+  //let paths = this.language.paths;
+
+  //for (let i = 0, len = paths.length; i < len; i++) {
+  for(path in this.language.paths){
+    //let path    = paths[i];
+    //let content = fs.readFileSync(path).toString()
+    //let content = data.toString();
+    content = cleanComments({
+      content: fs.readFileSync(path).toString(),
+      comment: this.language
+    });
+    
+    indentation({
+      path    : path,
+      content : content,
+      language: this.language,
+      fixIdent: this.set
+    });
+  }
+  //return configLanguage.dependencies;
+}
+
+dependencies.prototype.setIndentation = function(path){
+  let keyword, comment, filepath,
+      //matcher = this.language.matcher,
+      lines   = this.content.split('\n'),
+      regex   = {
+        comment : {
+          line : new RegExp(/\/\//),
+          multiple : {
+            init : /\/\*/
+          }  
+        },
+        space : / + {1}/g,
+        path : {
+          back : /\.\.\//,
+          clean: /.+?(?=\*)/
+        }
+      };
+      
+  let lengthSpaceTemp = 0
+  let isActiveComment   = false;
+
+  for(line in lines){
+    
+    if(this.language.comment.isTab){
+      let lengthSpace = 0 || line.match(regex.space).toString().length;
+      
+      if(isActiveComment && lengthSpaceTemp < lengthSpace){
+        continue;
+      }
+
+      if(regex.comment.line.exec(line)){
+        lengthSpaceTemp = lengthSpace;
+        isActiveComment = true;
+        continue;
+      }
+
+      isActiveComment = false;
+      keyword = this.language.matcher.exec(line);
+
+      if(keyword){
+        let filepaths     = keyword[1].trim(),
+            filepathsFix  = [],
+            pathBase      = this.language.baseDir || pathNode.dirname(path),
+            fnPath        = (regex.path.back.test(filepaths))? pathNode.resolve : pathNode.join;
+
+        filepathsFix.push(fnPath(pathBase, filepaths));
+        
+        if(regex.comment.multiple.init.test(filepathsFix[0])){
+          filepathsFix = glob.sync(filepathsFix[0].match(regex.path.clean)[0] + "/**/*" + this.language.ext);
+        }
+
+        this.set(filepathsFix, path);
+      }
+    }
+
+  }
+}
+
+dependencies.prototype.set = function(filepaths, path){
+  for(filepath in filepaths){
+    if(typeof this.language.dependencies[filepath] == "undefined"){
+      this.language.dependencies[filepath]      = {};
+      this.language.dependencies[filepath].list = [];
+    }
+    this.language.dependencies[filepath].list.push(path);
+  }  
+}
+
+dependencies.prototype.get = function(chunk, language){
+  let listDepent = [],
+      self       = this,
+      path       = chunk.path;
+
+  Events({
+    event  : chunk.type,
+    changed: this.set
+  });
+
+  listDepent.push(path);
+
+  self.recursiveDepent = function(pathFile){
+    if( typeof language.dependencies[pathFile] !== "undefined") {
+      for(var i in language.dependencies[pathFile].list){
+        var dep = dependenciesPath[i];
+        listDepent.push(dep);
+        self.recursiveDepent(dep);
+      }
+    }
+  }
+ 
+  self.recursiveDepent(path);
+  return util.removeDuplicates(listDepent);
+}
+
+/*
+ old
+*/
 
 fn = {
   createDependencies: (config) => {
@@ -20,7 +153,7 @@ fn = {
       content     = cleanComments({content: content, comment:configLanguage.comment})
       fn._indentBasedLanguage(path, content)
     }
-    return configLanguage
+    return configLanguage.dependencies;
   },
 
   _indentBasedLanguage: (path, content) => {
@@ -74,14 +207,11 @@ fn = {
           let baseDirCurrent = filepath.match(/.+?(?=\*)/);
           var filesDirectoryMoment = glob.sync(baseDirCurrent[0] + "/**/*" + configLanguage.ext);
 
-          for (var j = 0, leng = filesDirectoryMoment.length ; j <leng ; j++) {
-
-            let pathTemp =  filesDirectoryMoment[j]
-            fn._saveDependencies(pathTemp, path)
+          for (filepath in filesDirectoryMoment) {
+            fn._saveDependencies(filepath, path)
           }
         }
         else{
-
           fn._saveDependencies(filepath, path)
         }
 
